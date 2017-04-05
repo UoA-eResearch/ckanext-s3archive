@@ -87,7 +87,7 @@ class s3archiveCommand(CkanCommand):
                 print 'Archived %s' % key_name
                 os.remove(full_path)
 
-        conn = s3connection.S3Connection(access_key, secret_key, calling_format=OrdinaryCallingFormat())
+        conn = s3connection.S3Connection(access_key, secret_key, calling_format=OrdinaryCallingFormat(), host='object.auckland.ac.nz', port=443)
         bucket = conn.get_bucket(bucket_name)
         try:
            os.path.walk(resource_path, walk, bucket)
