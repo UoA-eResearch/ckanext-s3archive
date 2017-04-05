@@ -5,6 +5,7 @@ from ckan import model
 import os
 import boto.s3.key as s3key
 import boto.s3.connection as s3connection
+from boto.s3.connection import OrdinaryCallingFormat
 import ckan.lib.munge as munge
 
 import logging
