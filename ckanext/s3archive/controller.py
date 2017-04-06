@@ -5,6 +5,7 @@ import mimetypes
 import os
 from pylons import config
 import boto.s3.connection as s3connection
+from boto.s3.connection import OrdinaryCallingFormat
 
 import ckan.logic as logic
 import ckan.lib.base as base
@@ -55,7 +56,7 @@ class S3Downloader(PackageController):
                 content_type, content_enc = mimetypes.guess_type(rsc.get('url',''))
                 key_name = filepath[len(filepath)-39:]
 
-                conn = s3connection.S3Connection(access_key, secret_key)
+                conn = s3connection.S3Connection(access_key, secret_key, calling_format=OrdinaryCallingFormat(), host='object.auckland.ac.nz', port=443)
                 bucket = conn.get_bucket(bucket_name)
 
                 key = None
