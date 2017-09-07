@@ -7,9 +7,7 @@ from pylons import config
 import boto.s3.connection as s3connection
 from boto.s3.connection import OrdinaryCallingFormat
 
-import ckan.logic as logic
-import ckan.lib.base as base
-from ckan.common import c, response, request, _
+#from ckan.common import c, response, request, _
 import ckan.model as model
 import ckan.lib.uploader as uploader
 
@@ -18,10 +16,10 @@ log = logging.getLogger(__name__)
 from ckan.controllers.package import PackageController
 import ckan.plugins.toolkit as toolkit
 
-NotFound = logic.NotFound
-NotAuthorized = logic.NotAuthorized
-get_action = logic.get_action
-
+NotFound = toolkit.ObjectNotFound
+NotAuthorized = toolkit.NotAuthorized
+get_action = toolkit.get_action
+c = toolkit.c
 
 class S3Downloader(PackageController):
 
@@ -37,9 +35,9 @@ class S3Downloader(PackageController):
             rsc = get_action('resource_show')(context, {'id': resource_id})
             pkg = get_action('package_show')(context, {'id': id})
         except NotFound:
-            toolkit.abort(404, _('Resource not found'))
+            toolkit.abort(404, toolkit._('Resource not found'))
         except NotAuthorized:
-            toolkit.abort(401, _('Unauthorized to read resource %s') % id)
+            toolkit.abort(401, toolkit._('Unauthorized to read resource %s') % id)
 
         if rsc.get('url_type') == 'upload':
             upload = uploader.get_resource_uploader(rsc)
@@ -61,7 +59,7 @@ class S3Downloader(PackageController):
                 for key in bucket.list(prefix=key_name.lstrip('/')):
                     pass
                 if not key:
-                    toolkit.abort(404, _('Resource data not found'))
+                    toolkit.abort(404, toolkit._('Resource data not found'))
 
                 headers = {}
                 if content_type:
@@ -72,15 +70,15 @@ class S3Downloader(PackageController):
 
             fileapp = paste.fileapp.FileApp(filepath)
             try:
-               status, headers, app_iter = request.call_application(fileapp)
+               status, headers, app_iter = toolkit.request.call_application(fileapp)
             except OSError:
-               toolkit.abort(404, _('Resource data not found'))
-            response.headers.update(dict(headers))
+               toolkit.abort(404, toolkit._('Resource data not found'))
+            toolkit.response.headers.update(dict(headers))
             content_type, content_enc = mimetypes.guess_type(rsc.get('url',''))
             if content_type:
-               response.headers['Content-Type'] = content_type
+               toolkit.response.headers['Content-Type'] = content_type
             return app_iter
         elif 'url' not in rsc:
-            toolkit.abort(404, _('No download is available'))
+            toolkit.abort(404, toolkit._('No download is available'))
         toolkit.redirect_to(rsc['url'])
 
