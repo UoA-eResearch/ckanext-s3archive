@@ -77,6 +77,7 @@ class S3Downloader(PackageController):
             content_type, content_enc = mimetypes.guess_type(rsc.get('url',''))
             if content_type:
                toolkit.response.headers['Content-Type'] = content_type
+            toolkit.response.status = status
             return app_iter
         elif 'url' not in rsc:
             toolkit.abort(404, toolkit._('No download is available'))
